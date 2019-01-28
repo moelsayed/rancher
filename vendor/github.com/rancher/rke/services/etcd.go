@@ -19,6 +19,7 @@ import (
 	"github.com/rancher/types/apis/management.cattle.io/v3"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
+	"k8s.io/client-go/util/cert"
 )
 
 const (
@@ -37,7 +38,8 @@ func RunEtcdPlane(
 	prsMap map[string]v3.PrivateRegistry,
 	updateWorkersOnly bool,
 	alpineImage string,
-	es v3.ETCDService) error {
+	es v3.ETCDService,
+	certMap map[string]pki.CertificatePKI) error {
 	log.Infof(ctx, "[%s] Building up etcd plane..", ETCDRole)
 	for _, host := range etcdHosts {
 		if updateWorkersOnly {
@@ -64,7 +66,19 @@ func RunEtcdPlane(
 			return err
 		}
 	}
-	log.Infof(ctx, "[%s] Successfully started etcd plane..", ETCDRole)
+	log.Infof(ctx, "[%s] Successfully started etcd plane.. Checking etcd cluster health", ETCDRole)
+	clientCert := cert.EncodeCertPEM(certMap[pki.KubeNodeCertName].Certificate)
+	clientkey := cert.EncodePrivateKeyPEM(certMap[pki.KubeNodeCertName].Key)
+	var healthy bool
+	for _, host := range etcdHosts {
+		_, _, healthCheckURL := GetProcessConfig(etcdNodePlanMap[host.Address].Processes[EtcdContainerName])
+		if healthy = isEtcdHealthy(ctx, localConnDialerFactory, host, clientCert, clientkey, healthCheckURL); healthy {
+			break
+		}
+	}
+	if !healthy {
+		return fmt.Errorf("[etcd] Etcd Cluster is not healthy")
+	}
 	return nil
 }
 
@@ -321,7 +335,8 @@ func RunEtcdSnapshotSave(ctx context.Context, etcdHost *hosts.Host, prsMap map[s
 	return nil
 }
 
-func DownloadEtcdSnapshot(ctx context.Context, etcdHost *hosts.Host, prsMap map[string]v3.PrivateRegistry, etcdSnapshotImage string, name string, es v3.ETCDService) error {
+func DownloadEtcdSnapshotFromS3(ctx context.Context, etcdHost *hosts.Host, prsMap map[string]v3.PrivateRegistry, etcdSnapshotImage string, name string, es v3.ETCDService) error {
+
 	log.Infof(ctx, "[etcd] Get snapshot [%s] on host [%s]", name, etcdHost.Address)
 	s3Backend := es.BackupConfig.S3BackupConfig
 	if len(s3Backend.Endpoint) == 0 || len(s3Backend.BucketName) == 0 {
@@ -333,6 +348,7 @@ func DownloadEtcdSnapshot(ctx context.Context, etcdHost *hosts.Host, prsMap map[
 			"etcd-backup",
 			"download",
 			"--name", name,
+			"--s3-backup=true",
 			"--s3-endpoint=" + s3Backend.Endpoint,
 			"--s3-accessKey=" + s3Backend.AccessKey,
 			"--s3-secretKey=" + s3Backend.SecretKey,
@@ -475,4 +491,70 @@ func configS3BackupImgCmd(ctx context.Context, imageCfg *container.Config, bc *v
 	}
 	imageCfg.Cmd = append(imageCfg.Cmd, cmd...)
 	return imageCfg
+}
+
+func StartBackupServer(ctx context.Context, etcdHost *hosts.Host, prsMap map[string]v3.PrivateRegistry, etcdSnapshotImage string, name string) error {
+	log.Infof(ctx, "[etcd] starting backup server on host [%s]", etcdHost.Address)
+
+	imageCfg := &container.Config{
+		Cmd: []string{
+			"/opt/rke-tools/rke-etcd-backup",
+			"etcd-backup",
+			"serve",
+			"--name", name,
+			"--cacert", pki.GetCertPath(pki.CACertName),
+			"--cert", pki.GetCertPath(pki.KubeNodeCertName),
+			"--key", pki.GetKeyPath(pki.KubeNodeCertName),
+		},
+		Image: etcdSnapshotImage,
+	}
+	hostCfg := &container.HostConfig{
+		Binds: []string{
+			fmt.Sprintf("%s:/backup", EtcdSnapshotPath),
+			fmt.Sprintf("%s:/etc/kubernetes:z", path.Join(etcdHost.PrefixPath, "/etc/kubernetes"))},
+		NetworkMode:   container.NetworkMode("host"),
+		RestartPolicy: container.RestartPolicy{Name: "on-failure"},
+	}
+	return docker.DoRunContainer(ctx, etcdHost.DClient, imageCfg, hostCfg, EtcdServeBackupContainerName, etcdHost.Address, ETCDRole, prsMap)
+}
+
+func DownloadEtcdSnapshotFromBackupServer(ctx context.Context, etcdHost *hosts.Host, prsMap map[string]v3.PrivateRegistry, etcdSnapshotImage, name string, backupServer *hosts.Host) error {
+	log.Infof(ctx, "[etcd] Get snapshot [%s] on host [%s]", name, etcdHost.Address)
+	imageCfg := &container.Config{
+		Cmd: []string{
+			"/opt/rke-tools/rke-etcd-backup",
+			"etcd-backup",
+			"download",
+			"--name", name,
+			"--local-endpoint", backupServer.Address,
+			"--cacert", pki.GetCertPath(pki.CACertName),
+			"--cert", pki.GetCertPath(pki.KubeNodeCertName),
+			"--key", pki.GetKeyPath(pki.KubeNodeCertName),
+		},
+		Image: etcdSnapshotImage,
+	}
+
+	hostCfg := &container.HostConfig{
+		Binds: []string{
+			fmt.Sprintf("%s:/backup", EtcdSnapshotPath),
+			fmt.Sprintf("%s:/etc/kubernetes:z", path.Join(etcdHost.PrefixPath, "/etc/kubernetes"))},
+		NetworkMode:   container.NetworkMode("host"),
+		RestartPolicy: container.RestartPolicy{Name: "on-failure"},
+	}
+
+	if err := docker.DoRunContainer(ctx, etcdHost.DClient, imageCfg, hostCfg, EtcdDownloadBackupContainerName, etcdHost.Address, ETCDRole, prsMap); err != nil {
+		return err
+	}
+
+	status, _, stderr, err := docker.GetContainerOutput(ctx, etcdHost.DClient, EtcdDownloadBackupContainerName, etcdHost.Address)
+	if status != 0 || err != nil {
+		if removeErr := docker.RemoveContainer(ctx, etcdHost.DClient, etcdHost.Address, EtcdDownloadBackupContainerName); removeErr != nil {
+			log.Warnf(ctx, "Failed to remove container [%s]: %v", removeErr)
+		}
+		if err != nil {
+			return err
+		}
+		return fmt.Errorf("Failed to download etcd snapshot from backup server [%s], exit code [%d]: %v", backupServer.Address, status, stderr)
+	}
+	return docker.RemoveContainer(ctx, etcdHost.DClient, etcdHost.Address, EtcdDownloadBackupContainerName)
 }
