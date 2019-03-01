@@ -521,6 +521,14 @@ func (d *Driver) ETCDRestore(ctx context.Context, clusterInfo *types.ClusterInfo
 	if err := cmd.RestoreEtcdSnapshot(ctx, &rkeConfig, dialers, externalFlags, snapshotName); err != nil {
 		return err
 	}
-	d.save(clusterInfo, stateDir)
+	// We save the cluster config after update to handle cases where
+	// the initial cofiguration provided to the restore wasn't correct and then
+	// was updated. This ensure that if the config sent to Restore is newer than
+	// the store, the store will get updated after the restore as well.
+	d.save(&types.ClusterInfo{
+		Metadata: map[string]string{
+			"Config": yaml,
+		},
+	}, stateDir)
 	return nil
 }
