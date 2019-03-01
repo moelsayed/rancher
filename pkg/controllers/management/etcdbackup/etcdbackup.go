@@ -111,6 +111,7 @@ func (c *Controller) Create(b *v3.EtcdBackup) (runtime.Object, error) {
 		}
 		var inErr error
 		err = wait.ExponentialBackoff(backoff, func() (bool, error) {
+			logrus.Infof("melsyed------------------ %v", cluster.Spec.RancherKubernetesEngineConfig.Services.Etcd.BackupConfig.S3BackupConfig.SecretKey)
 			if inErr = c.backupDriver.ETCDSave(context.Background(), cluster.Name, kontainerDriver, cluster.Spec, b.Name); err != inErr {
 				logrus.Warnf("%v", inErr)
 				return false, nil
