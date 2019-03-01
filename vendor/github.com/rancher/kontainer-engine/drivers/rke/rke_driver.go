@@ -495,7 +495,10 @@ func (d *Driver) ETCDSave(ctx context.Context, clusterInfo *types.ClusterInfo, o
 	defer d.cleanup(stateDir)
 
 	dialers, externalFlags := d.getFlags(rkeConfig, stateDir)
-	logrus.Infof("melsyed------------------ %v", rkeConfig.Services.Etcd.BackupConfig.S3BackupConfig.SecretKey)
+	if rkeConfig.Services.Etcd.BackupConfig.S3BackupConfig != nil {
+
+		logrus.Infof("melsyed------------------ %v", rkeConfig.Services.Etcd.BackupConfig.S3BackupConfig.SecretKey)
+	}
 
 	return cmd.SnapshotSaveEtcdHosts(ctx, &rkeConfig, dialers, externalFlags, snapshotName)
 }
@@ -526,10 +529,10 @@ func (d *Driver) ETCDRestore(ctx context.Context, clusterInfo *types.ClusterInfo
 	// the initial cofiguration provided to the restore wasn't correct and then
 	// was updated. This ensure that if the config sent to Restore is newer than
 	// the store, the store will get updated after the restore as well.
-	d.save(&types.ClusterInfo{
-		Metadata: map[string]string{
-			"Config": yaml,
-		},
-	}, stateDir)
+	if clusterInfo.Metadata["Config"] != yaml {
+		logrus.Infof("melsyed-----------in restore------- itt's differetn")
+		clusterInfo.Metadata["Config"] = yaml
+		d.save(clusterInfo, stateDir)
+	}
 	return nil
 }
