@@ -518,5 +518,9 @@ func (d *Driver) ETCDRestore(ctx context.Context, clusterInfo *types.ClusterInfo
 
 	dialers, externalFlags := d.getFlags(rkeConfig, stateDir)
 
-	return cmd.RestoreEtcdSnapshot(ctx, &rkeConfig, dialers, externalFlags, snapshotName)
+	 if err := cmd.RestoreEtcdSnapshot(ctx, &rkeConfig, dialers, externalFlags, snapshotName); err!= nil{
+		 return nil
+	 }
+	 d.save(, stateDir)
+	 return nil
 }
