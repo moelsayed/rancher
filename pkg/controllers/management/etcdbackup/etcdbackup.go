@@ -13,14 +13,15 @@ import (
 	"github.com/rancher/rancher/pkg/controllers/management/clusterprovisioner"
 	"github.com/rancher/rancher/pkg/rkedialerfactory"
 	"github.com/rancher/rancher/pkg/ticker"
-	"github.com/rancher/types/apis/core/v1"
-	"github.com/rancher/types/apis/management.cattle.io/v3"
+	v1 "github.com/rancher/types/apis/core/v1"
+	v3 "github.com/rancher/types/apis/management.cattle.io/v3"
 	"github.com/rancher/types/config"
 	"github.com/sirupsen/logrus"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/util/wait"
 )
 
 const (
@@ -93,10 +94,24 @@ func (c *Controller) Create(b *v3.EtcdBackup) (runtime.Object, error) {
 	if err != nil {
 		return b, err
 	}
+
+	backoff := wait.Backoff{
+		Duration: 100 * time.Millisecond,
+		Factor:   2,
+		Jitter:   0,
+		Steps:    4,
+	}
+
 	bObj, saveErr := v3.BackupConditionCompleted.Do(b, func() (runtime.Object, error) {
-		err = c.backupDriver.ETCDSave(context.Background(), cluster.Name, kontainerDriver, cluster.Spec, b.Name)
+		err := wait.ExponentialBackoff(backoff, func() (bool, error) {
+			if err := c.backupDriver.ETCDSave(context.Background(), cluster.Name, kontainerDriver, cluster.Spec, b.Name); err != nil {
+				return false, err
+			}
+			return true, nil
+		})
 		return b, err
 	})
+
 	b, err = c.backupClient.Update(bObj.(*v3.EtcdBackup))
 	if err != nil {
 		return b, err
