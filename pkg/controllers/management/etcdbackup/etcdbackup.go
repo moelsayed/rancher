@@ -135,7 +135,18 @@ func (c *Controller) Remove(b *v3.EtcdBackup) (runtime.Object, error) {
 	if b.Spec.BackupConfig.S3BackupConfig == nil {
 		return b, nil
 	}
-	return b, c.deleteS3Snapshot(b)
+	// try to remove from s3 for 3 times, then give up. if we don't we get stuck forever
+	var delErr error
+	for i := 0; i < 3; i++ {
+		if delErr := c.deleteS3Snapshot(b); delErr != nil {
+			logrus.Warnf("failed to delete backup from s3: %v", delErr)
+		}
+		time.Sleep(2 * time.Second)
+	}
+	if delErr != nil {
+		logrus.Warnf("giving up on deleting backup [%s]: %v", b.Name, delErr)
+	}
+	return b, nil
 }
 
 func (c *Controller) Updated(b *v3.EtcdBackup) (runtime.Object, error) {
@@ -294,11 +305,11 @@ func (c *Controller) deleteS3Snapshot(b *v3.EtcdBackup) error {
 	if err != nil {
 		return fmt.Errorf("can't access bucket: %v", err)
 	}
+
 	if !exists {
 		logrus.Errorf("bucket %s doesn't exist", bucket)
 		return nil
 	}
-
 	return s3Client.RemoveObject(bucket, b.Name)
 }
 
