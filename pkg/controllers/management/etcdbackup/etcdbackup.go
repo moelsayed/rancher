@@ -99,7 +99,7 @@ func (c *Controller) Create(b *v3.EtcdBackup) (runtime.Object, error) {
 		Duration: 1000 * time.Millisecond,
 		Factor:   5,
 		Jitter:   0,
-		Steps:    4,
+		Steps:    5,
 	}
 
 	bObj, saveErr := v3.BackupConditionCompleted.Do(b, func() (runtime.Object, error) {
@@ -107,18 +107,17 @@ func (c *Controller) Create(b *v3.EtcdBackup) (runtime.Object, error) {
 		if err != nil {
 			return b, err
 		}
-		logrus.Infof("melsayed----------------------------outside %v", backoff.Duration)
+		var inErr error
 		err = wait.ExponentialBackoff(backoff, func() (bool, error) {
 			logrus.Infof("melsayed----------------------------inside %v", backoff.Duration)
-
-			if err := c.backupDriver.ETCDSave(context.Background(), cluster.Name, kontainerDriver, cluster.Spec, b.Name); err != nil {
-				logrus.Warnf("%v", err)
+			if inErr = c.backupDriver.ETCDSave(context.Background(), cluster.Name, kontainerDriver, cluster.Spec, b.Name); err != inErr {
+				logrus.Warnf("%v", inErr)
 				return false, nil
 			}
 			return true, nil
 		})
 
-		return b, err
+		return b, inErr
 	})
 
 	b, err = c.backupClient.Update(bObj.(*v3.EtcdBackup))
