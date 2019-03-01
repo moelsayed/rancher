@@ -23,7 +23,7 @@ func (c *Cluster) ETCDRestore(ctx context.Context, snapshotName string) error {
 		return err
 	}
 	transformClusterInfo(c, toInfo(c))
-	return nil
+	return c.Store()
 }
 
 func (c *Cluster) getDriverOps() (*types.DriverOptions, error) {
