@@ -517,6 +517,7 @@ func (d *Driver) ETCDRestore(ctx context.Context, clusterInfo *types.ClusterInfo
 	defer d.cleanup(stateDir)
 
 	dialers, externalFlags := d.getFlags(rkeConfig, stateDir)
+	logrus.Infof("melsyed-----------in restore------- %v", rkeConfig.Services.Etcd.BackupConfig.S3BackupConfig.SecretKey)
 
 	if err := cmd.RestoreEtcdSnapshot(ctx, &rkeConfig, dialers, externalFlags, snapshotName); err != nil {
 		return err

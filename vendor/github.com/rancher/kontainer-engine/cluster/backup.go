@@ -19,7 +19,11 @@ func (c *Cluster) ETCDRestore(ctx context.Context, snapshotName string) error {
 	if err != nil {
 		return err
 	}
-	return c.Driver.ETCDRestore(ctx, toInfo(c), driverOpts, snapshotName)
+	if err := c.Driver.ETCDRestore(ctx, toInfo(c), driverOpts, snapshotName); err != nil {
+		return err
+	}
+	transformClusterInfo(c, toInfo(c))
+	return nil
 }
 
 func (c *Cluster) getDriverOps() (*types.DriverOptions, error) {
