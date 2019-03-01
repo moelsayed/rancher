@@ -21,8 +21,9 @@ import (
 	"github.com/rancher/rke/k8s"
 	"github.com/rancher/rke/log"
 	"github.com/rancher/rke/pki"
-	"github.com/rancher/types/apis/management.cattle.io/v3"
-	"k8s.io/apimachinery/pkg/apis/meta/v1"
+	v3 "github.com/rancher/types/apis/management.cattle.io/v3"
+	"github.com/sirupsen/logrus"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 )
@@ -494,6 +495,7 @@ func (d *Driver) ETCDSave(ctx context.Context, clusterInfo *types.ClusterInfo, o
 	defer d.cleanup(stateDir)
 
 	dialers, externalFlags := d.getFlags(rkeConfig, stateDir)
+	logrus.Infof("melsyed------------------ %v", rkeConfig.Services.Etcd.BackupConfig.S3BackupConfig.SecretKey)
 
 	return cmd.SnapshotSaveEtcdHosts(ctx, &rkeConfig, dialers, externalFlags, snapshotName)
 }
