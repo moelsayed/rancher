@@ -84,6 +84,8 @@ func (c *Controller) Create(b *v3.EtcdBackup) (runtime.Object, error) {
 		b.Spec.Filename = getBackupFilename(b.Name, cluster)
 		b.Spec.BackupConfig = *cluster.Spec.RancherKubernetesEngineConfig.Services.Etcd.BackupConfig
 		v3.BackupConditionCreated.True(b)
+		// we set ConditionCompleted to Unknown to avoid incorrect "active" state
+		v3.BackupConditionCompleted.Unknown(b)
 		b, err = c.backupClient.Update(b)
 		if err != nil {
 			return b, err
@@ -97,9 +99,9 @@ func (c *Controller) Create(b *v3.EtcdBackup) (runtime.Object, error) {
 
 	backoff := wait.Backoff{
 		Duration: 1000 * time.Millisecond,
-		Factor:   5,
+		Factor:   2,
 		Jitter:   0,
-		Steps:    5,
+		Steps:    3,
 	}
 
 	bObj, saveErr := v3.BackupConditionCompleted.Do(b, func() (runtime.Object, error) {
@@ -109,7 +111,6 @@ func (c *Controller) Create(b *v3.EtcdBackup) (runtime.Object, error) {
 		}
 		var inErr error
 		err = wait.ExponentialBackoff(backoff, func() (bool, error) {
-			logrus.Infof("melsayed----------------------------inside %v", backoff.Duration)
 			if inErr = c.backupDriver.ETCDSave(context.Background(), cluster.Name, kontainerDriver, cluster.Spec, b.Name); err != inErr {
 				logrus.Warnf("%v", inErr)
 				return false, nil
