@@ -107,7 +107,7 @@ func ClusterUp(ctx context.Context, dialersOptions hosts.DialersOptions, flags c
 		return APIURL, caCrt, clientCert, clientKey, nil, err
 	}
 
-	if !flags.DisablePortCheck {
+	if flags.DisablePortCheck {
 		if err = kubeCluster.CheckClusterPorts(ctx, currentCluster); err != nil {
 			return APIURL, caCrt, clientCert, clientKey, nil, err
 		}
