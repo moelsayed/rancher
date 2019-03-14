@@ -112,9 +112,9 @@ func (c *Cluster) PrepareBackup(ctx context.Context, snapshotPath string) error 
 			}
 		}
 		// all good, let's remove the backup server container
-		// if err := docker.DoRemoveContainer(ctx, backupServer.DClient, services.EtcdServeBackupContainerName, backupServer.Address); err != nil {
-		// 	return err
-		// }
+		if err := docker.DoRemoveContainer(ctx, backupServer.DClient, services.EtcdServeBackupContainerName, backupServer.Address); err != nil {
+			return err
+		}
 		backupReady = true
 	}
 
