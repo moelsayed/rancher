@@ -522,18 +522,27 @@ func StartBackupServer(ctx context.Context, etcdHost *hosts.Host, prsMap map[str
 	if err := docker.DoRunContainer(ctx, etcdHost.DClient, imageCfg, hostCfg, EtcdServeBackupContainerName, etcdHost.Address, ETCDRole, prsMap); err != nil {
 		return err
 	}
+	logrus.Infof("melsayed---------StartBackupServer----------------- doRun passed")
 	container, err := docker.InspectContainer(ctx, etcdHost.DClient, etcdHost.Address, EtcdServeBackupContainerName)
 	if err != nil {
 		return err
 	}
+	logrus.Infof("melsayed-----------StartBackupServer--------------- inspect passed")
+
 	if !container.State.Running {
 		containerLog, _, err := docker.GetContainerLogsStdoutStderr(ctx, etcdHost.DClient, EtcdServeBackupContainerName, "1", false)
+		logrus.Infof("melsayed--------------StartBackupServer------------ getting the logs")
+
 		if err != nil {
 			return err
 		}
+		logrus.Infof("melsayed-------StartBackupServer------------------- gonna remove now passed")
+
 		if err := docker.RemoveContainer(ctx, etcdHost.DClient, etcdHost.Address, EtcdServeBackupContainerName); err != nil {
 			return err
 		}
+		logrus.Infof("melsayed-----------StartBackupServer--------------- removed passed")
+
 		// printing the restore container's logs
 		return fmt.Errorf("Failed to run backup server container, container logs: %s", containerLog)
 	}
@@ -570,14 +579,13 @@ func DownloadEtcdSnapshotFromBackupServer(ctx context.Context, etcdHost *hosts.H
 
 	status, _, stderr, err := docker.GetContainerOutput(ctx, etcdHost.DClient, EtcdDownloadBackupContainerName, etcdHost.Address)
 	if status != 0 || err != nil {
-		// if removeErr := docker.RemoveContainer(ctx, etcdHost.DClient, etcdHost.Address, EtcdDownloadBackupContainerName); removeErr != nil {
-		// 	log.Warnf(ctx, "Failed to remove container [%s]: %v", removeErr)
-		// }
+		if removeErr := docker.RemoveContainer(ctx, etcdHost.DClient, etcdHost.Address, EtcdDownloadBackupContainerName); removeErr != nil {
+			log.Warnf(ctx, "Failed to remove container [%s]: %v", removeErr)
+		}
 		if err != nil {
 			return err
 		}
 		return fmt.Errorf("Failed to download etcd snapshot from backup server [%s], exit code [%d]: %v", backupServer.Address, status, stderr)
 	}
-	// return docker.RemoveContainer(ctx, etcdHost.DClient, etcdHost.Address, EtcdDownloadBackupContainerName)
-	return nil
+	return docker.RemoveContainer(ctx, etcdHost.DClient, etcdHost.Address, EtcdDownloadBackupContainerName)
 }

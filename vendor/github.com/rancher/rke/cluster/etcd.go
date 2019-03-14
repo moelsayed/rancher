@@ -11,6 +11,7 @@ import (
 	"github.com/rancher/rke/pki"
 	"github.com/rancher/rke/services"
 	"github.com/rancher/rke/util"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -69,16 +70,26 @@ func (c *Cluster) PrepareBackup(ctx context.Context, snapshotPath string) error 
 		(c.Services.Etcd.BackupConfig != nil && IsLocalSnapshot(snapshotPath)) { // rancher local backup and snapshot name indicates a local snapshot
 		// stop etcd on all etcd nodes, we need this because we start the backup server on the same port
 		for _, host := range c.EtcdHosts {
+			logrus.Infof("melsayed--------------- starting with host [%s]", host.Address)
 			if err := docker.StopContainer(ctx, host.DClient, host.Address, services.EtcdContainerName); err != nil {
 				log.Warnf(ctx, "failed to stop etcd container on host [%s]: %v", host.Address, err)
 			}
 			if backupServer == nil { // start the download server, only one node should have it!
+				logrus.Infof("melsayed--------------- no backup server, trying on [%s]", host.Address)
 				if err := services.StartBackupServer(ctx, host, c.PrivateRegistriesMap, backupImage, snapshotPath); err != nil {
+					logrus.Infof("melsayed--------------- failed to run on  [%s]", host.Address)
 					log.Warnf(ctx, "failed to start backup server on host [%s]: %v", host.Address, err)
 					errors = append(errors, err)
+					// if err = docker.DoRemoveContainer(ctx, backupServer.DClient, services.EtcdServeBackupContainerName, backupServer.Address); err != nil {
+					// 	log.Warnf(ctx, "failed to remove backup server on host [%s]: %v", host.Address, err)
+					// 	errors = append(errors, err)
+					// }
 					continue
 				}
 				backupServer = host
+				logrus.Infof("melsayed--------------- found it 2 [%s]", backupServer.Address)
+				logrus.Infof("melsayed--------------- found it 1 [%s]", host.Address)
+
 				break
 			}
 		}
@@ -101,9 +112,9 @@ func (c *Cluster) PrepareBackup(ctx context.Context, snapshotPath string) error 
 			}
 		}
 		// all good, let's remove the backup server container
-		if err := docker.DoRemoveContainer(ctx, backupServer.DClient, services.EtcdServeBackupContainerName, backupServer.Address); err != nil {
-			return err
-		}
+		// if err := docker.DoRemoveContainer(ctx, backupServer.DClient, services.EtcdServeBackupContainerName, backupServer.Address); err != nil {
+		// 	return err
+		// }
 		backupReady = true
 	}
 
