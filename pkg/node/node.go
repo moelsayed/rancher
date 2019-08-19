@@ -83,6 +83,8 @@ func GetEndpointNodeIP(node *v3.Node) string {
 	if node.Annotations != nil {
 		logrus.Infof("melsayed---------- node.Status.NodeAnnotations %v", node.Status.NodeAnnotations)
 		externalIP = node.Status.NodeAnnotations[externalAddressAnnotation]
+		logrus.Infof("melsayed---------- node.Status.NodeAnnotations externalIP %v", externalIP)
+
 		if externalIP != "" {
 			return externalIP
 		}
