@@ -3,6 +3,7 @@ package mapper
 import (
 	"github.com/rancher/norman/types"
 	"github.com/rancher/norman/types/values"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -40,6 +41,7 @@ type NodeAddressAnnotationMapper struct {
 
 func (n NodeAddressAnnotationMapper) FromInternal(data map[string]interface{}) {
 	externalIP, ok := values.GetValue(data, "status", "nodeAnnotations", "rke.cattle.io/external-ip")
+	logrus.Infof("melsayed-----------------NodeAddressAnnotationMapper FromInternal  someone called ?%v", externalIP)
 	if ok {
 		data[extIPField] = externalIP
 	}
