@@ -257,6 +257,7 @@ func getAllNodesPublicEndpointIP(machineLister managementv3.NodeLister, clusterN
 	for _, machine := range machines {
 		if machine.Spec.Worker && isMachineReady(machine) {
 			nodePublicIP := net.ParseIP(nodehelper.GetEndpointNodeIP(machine))
+			logrus.Infof("melsayed--------------------- nodePublicIP %v", nodePublicIP)
 			if nodePublicIP.String() != "" {
 				addresses = append(addresses, nodePublicIP)
 			}
