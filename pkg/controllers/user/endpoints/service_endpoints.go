@@ -47,15 +47,19 @@ func (s *ServicesController) reconcileEndpointsForService(svc *corev1.Service) (
 	if err != nil {
 		return false, err
 	}
+	logrus.Infof("melsayed----------------------------- %v", allNodesIP)
 	newPublicEps, err := convertServiceToPublicEndpoints(svc, "", nil, allNodesIP)
 	if err != nil {
 		return false, err
 	}
+	logrus.Infof("melsayed----------------------------- %v", newPublicEps)
 
 	existingPublicEps := getPublicEndpointsFromAnnotations(svc.Annotations)
 	if areEqualEndpoints(existingPublicEps, newPublicEps) {
 		return false, nil
 	}
+	logrus.Infof("melsayed----------------------------- %v", existingPublicEps)
+
 	toUpdate := svc.DeepCopy()
 	epsToUpdate, err := publicEndpointsToString(newPublicEps)
 	if err != nil {
