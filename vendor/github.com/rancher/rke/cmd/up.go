@@ -84,7 +84,16 @@ func ClusterUp(ctx context.Context, dialersOptions hosts.DialersOptions, flags c
 	if err != nil {
 		return APIURL, caCrt, clientCert, clientKey, nil, err
 	}
-	kubeCluster, err := cluster.InitClusterObject(ctx, clusterState.DesiredState.RancherKubernetesEngineConfig.DeepCopy(), flags)
+	// We generate the first encryption config in ClusterInit, to store it ASAP. It's written
+	// to the DesiredState
+	stateEncryptionConfig := clusterState.DesiredState.EncryptionConfig
+
+	// if CurrentState has EncryptionConfig, it means this is NOT the first time we enable encryption, we should use the _latest_ applied value from the current cluster
+	if clusterState.CurrentState.EncryptionConfig != "" {
+		stateEncryptionConfig = clusterState.CurrentState.EncryptionConfig
+	}
+
+	kubeCluster, err := cluster.InitClusterObject(ctx, clusterState.DesiredState.RancherKubernetesEngineConfig.DeepCopy(), flags, stateEncryptionConfig)
 	if err != nil {
 		return APIURL, caCrt, clientCert, clientKey, nil, err
 	}
@@ -136,9 +145,13 @@ func ClusterUp(ctx context.Context, dialersOptions hosts.DialersOptions, flags c
 	if err != nil {
 		return APIURL, caCrt, clientCert, clientKey, nil, err
 	}
+
 	// update APIURL after reconcile
 	if len(kubeCluster.ControlPlaneHosts) > 0 {
 		APIURL = fmt.Sprintf("https://" + kubeCluster.ControlPlaneHosts[0].Address + ":6443")
+	}
+	if err = cluster.ReconcileEncryptionProviderConfig(ctx, kubeCluster, currentCluster); err != nil {
+		return APIURL, caCrt, clientCert, clientKey, nil, err
 	}
 
 	if err := kubeCluster.PrePullK8sImages(ctx); err != nil {
@@ -149,7 +162,6 @@ func ClusterUp(ctx context.Context, dialersOptions hosts.DialersOptions, flags c
 	if err != nil {
 		return APIURL, caCrt, clientCert, clientKey, nil, err
 	}
-
 	// Apply Authz configuration after deploying controlplane
 	err = cluster.ApplyAuthzResources(ctx, kubeCluster.RancherKubernetesEngineConfig, flags, dialersOptions)
 	if err != nil {
@@ -183,6 +195,11 @@ func ClusterUp(ctx context.Context, dialersOptions hosts.DialersOptions, flags c
 	err = cluster.ConfigureCluster(ctx, kubeCluster.RancherKubernetesEngineConfig, kubeCluster.Certificates, flags, dialersOptions, data, false)
 	if err != nil {
 		return APIURL, caCrt, clientCert, clientKey, nil, err
+	}
+	if kubeCluster.EncryptionConfig.RewriteSecrets {
+		if err = kubeCluster.RewriteSecrets(ctx); err != nil {
+			return APIURL, caCrt, clientCert, clientKey, nil, err
+		}
 	}
 
 	if err := checkAllIncluded(kubeCluster); err != nil {

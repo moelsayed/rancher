@@ -66,7 +66,6 @@ func ReconcileCluster(ctx context.Context, kubeCluster, currentCluster *Cluster,
 			return err
 		}
 	}
-
 	log.Infof(ctx, "[reconcile] Reconciled cluster state successfully")
 	return nil
 }
@@ -131,6 +130,10 @@ func reconcileControl(ctx context.Context, currentCluster, kubeCluster *Cluster,
 	if err := rebuildLocalAdminConfig(ctx, kubeCluster); err != nil {
 		return err
 	}
+
+	// if err = ReconcileEncryptionProviderConfig(ctx, kubeCluster, currentCluster); err != nil {
+	// 	return err
+	// }
 	return nil
 }
 

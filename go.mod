@@ -7,6 +7,8 @@ replace (
 	github.com/crewjam/saml => github.com/rancher/saml v0.0.0-20180713225824-ce1532152fde
 	github.com/knative/pkg => github.com/rancher/pkg v0.0.0-20190514055449-b30ab9de040e
 	github.com/matryer/moq => github.com/rancher/moq v0.0.0-20190404221404-ee5226d43009
+	github.com/rancher/rke => github.com/moelsayed/rke v0.0.0-20190927195657-b177764828fd
+	github.com/rancher/types => github.com/moelsayed/types v0.0.0-20190927180104-29f10231d03f
 	k8s.io/client-go => github.com/rancher/client-go v1.14.5-rancher.1
 )
 
@@ -88,7 +90,7 @@ require (
 	k8s.io/api v0.0.0-20190805182251-6c9aa3caf3d6
 	k8s.io/apiextensions-apiserver v0.0.0-20190805184801-2defa3e98ef1
 	k8s.io/apimachinery v0.0.0-20190404173353-6a84e37a896d
-	k8s.io/apiserver v0.0.0-20190805183321-97412272efd4
+	k8s.io/apiserver v0.0.0-20190918223255-26459790ef01
 	k8s.io/cli-runtime v0.0.0-20190805185326-9eaa1a86d213
 	k8s.io/client-go v11.0.1-0.20190805182715-88a2adca7e76+incompatible
 	k8s.io/cloud-provider v0.0.0-20190805190417-1c521de1d7ab // indirect
