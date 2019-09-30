@@ -409,6 +409,7 @@ func toMap(rawMap interface{}) map[string]interface{} {
 }
 
 func (r *Store) Update(apiContext *types.APIContext, schema *types.Schema, data map[string]interface{}, id string) (map[string]interface{}, error) {
+	lorgus.Infof("melsayed-------------- called update")
 	updatedName := convert.ToString(data["name"])
 	if updatedName == "" {
 		return nil, httperror.NewFieldAPIError(httperror.MissingRequired, "Cluster name", "")
@@ -432,6 +433,7 @@ func (r *Store) Update(apiContext *types.APIContext, schema *types.Schema, data 
 			return nil, err
 		}
 	}
+	lorgus.Infof("melsayed-------------- called update2")
 
 	//check if template is passed. if yes, load template data
 	if hasTemplate(data) {
@@ -475,6 +477,7 @@ func (r *Store) Update(apiContext *types.APIContext, schema *types.Schema, data 
 	if err := validateNetworkFlag(data, false); err != nil {
 		return nil, httperror.NewFieldAPIError(httperror.InvalidOption, "enableNetworkPolicy", err.Error())
 	}
+	lorgus.Infof("melsayed-------------- called update3")
 
 	setBackupConfigSecretKeyIfNotExists(existingCluster, data)
 	setPrivateRegistryPasswordIfNotExists(existingCluster, data)
@@ -482,6 +485,7 @@ func (r *Store) Update(apiContext *types.APIContext, schema *types.Schema, data 
 	if err := validateUpdatedS3Credentials(existingCluster, data); err != nil {
 		return nil, err
 	}
+	lorgus.Infof("melsayed-------------- called update4")
 
 	return r.Store.Update(apiContext, schema, data, id)
 }
