@@ -280,9 +280,9 @@ func (c *Cluster) readEncryptionCustomConfig(ctx context.Context, flags External
 	var r map[string]interface{}
 	logrus.Infof("melsayed------------------------------- flags in readEncryptionCustomConfig %#v", flags)
 
-	file, err := os.Open(c.ConfigPath)
+	file, err := os.Open(c.ConfigDir)
 	if err != nil {
-		return "", fmt.Errorf("can not find cluster configuration file - %v - : %v", c.ConfigPath, err)
+		return "", fmt.Errorf("can not find cluster configuration file - %v - : %v", c.ConfigDir, err)
 	}
 	defer file.Close()
 	buf, err := ioutil.ReadAll(file)
