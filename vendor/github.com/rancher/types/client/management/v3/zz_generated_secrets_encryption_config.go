@@ -7,6 +7,6 @@ const (
 )
 
 type SecretsEncryptionConfig struct {
-	CustomConfig string `json:"customConfig,omitempty" yaml:"customConfig,omitempty"`
-	Enabled      bool   `json:"enabled,omitempty" yaml:"enabled,omitempty"`
+	CustomConfig *EncryptionConfiguration `json:"customConfig,omitempty" yaml:"customConfig,omitempty"`
+	Enabled      bool                     `json:"enabled,omitempty" yaml:"enabled,omitempty"`
 }
