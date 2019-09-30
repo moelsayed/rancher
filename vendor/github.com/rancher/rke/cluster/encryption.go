@@ -280,7 +280,7 @@ func (c *Cluster) readEncryptionCustomConfig(ctx context.Context) (string, error
 
 	file, err := os.Open(c.ConfigPath)
 	if err != nil {
-		return "", fmt.Errorf("can not find cluster configuration file: %v", err)
+		return "", fmt.Errorf("can not find cluster configuration file %v : %v", c.ConfigPath, err)
 	}
 	defer file.Close()
 	buf, err := ioutil.ReadAll(file)
