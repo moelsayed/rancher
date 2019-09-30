@@ -182,6 +182,8 @@ func InitClusterObject(ctx context.Context, rkeConfig *v3.RancherKubernetesEngin
 	if len(c.ConfigPath) == 0 {
 		c.ConfigPath = pki.ClusterConfig
 	}
+	logrus.Infof("melsayed------------------------------- flags in InitClusterObject %#v", flags)
+
 	// set kube_config, state file, and certificate dir
 	c.LocalKubeConfigPath = pki.GetLocalKubeConfig(c.ConfigPath, c.ConfigDir)
 	c.StateFilePath = GetStateFilePath(c.ConfigPath, c.ConfigDir)
