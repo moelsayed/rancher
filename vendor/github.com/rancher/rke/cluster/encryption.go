@@ -287,6 +287,8 @@ func (c *Cluster) readEncryptionCustomConfig(ctx context.Context, flags External
 	if err != nil {
 		return "", fmt.Errorf("error unmarshalling: %v", err)
 	}
+	logrus.Infof("melsayed------------------------------- flags in readEncryptionCustomConfig %#v", r)
+
 	services := r["services"].(map[string]interface{})
 	kubeapi := services["kube-api"].(map[string]interface{})
 	sec := kubeapi["secrets_encryption_config"].(map[string]interface{})
