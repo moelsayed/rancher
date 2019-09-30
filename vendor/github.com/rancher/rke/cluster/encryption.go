@@ -275,8 +275,9 @@ func disabledProviderFileFromKey(keyList interface{}) (string, error) {
 	return templates.CompileTemplateFromMap(templates.DisabledEncryptionProviderFile, keyList)
 }
 
-func (c *Cluster) readEncryptionCustomConfig(ctx context.Context) (string, error) {
+func (c *Cluster) readEncryptionCustomConfig(ctx context.Context, flags ExternalFlags) (string, error) {
 	var r map[string]interface{}
+	logrus.Infof("melsayed------------------------------- flags in readEncryptionCustomConfig %#v", flags)
 
 	file, err := os.Open(c.ConfigPath)
 	if err != nil {

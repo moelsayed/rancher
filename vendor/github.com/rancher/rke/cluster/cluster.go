@@ -182,7 +182,6 @@ func InitClusterObject(ctx context.Context, rkeConfig *v3.RancherKubernetesEngin
 	if len(c.ConfigPath) == 0 {
 		c.ConfigPath = pki.ClusterConfig
 	}
-	logrus.Infof("melsayed------------------------------- flags in InitClusterObject %#v", flags)
 
 	// set kube_config, state file, and certificate dir
 	c.LocalKubeConfigPath = pki.GetLocalKubeConfig(c.ConfigPath, c.ConfigDir)
@@ -191,7 +190,7 @@ func InitClusterObject(ctx context.Context, rkeConfig *v3.RancherKubernetesEngin
 		c.CertificateDir = GetCertificateDirPath(c.ConfigPath, c.ConfigDir)
 	}
 	if isEncryptionCustomConfig(rkeConfig) && c.EncryptionConfig.EncryptionProviderFile == "" {
-		if c.EncryptionConfig.EncryptionProviderFile, err = c.readEncryptionCustomConfig(ctx); err != nil {
+		if c.EncryptionConfig.EncryptionProviderFile, err = c.readEncryptionCustomConfig(ctx, flags); err != nil {
 			return nil, err
 		}
 	} else if isEncryptionEnabled(rkeConfig) && c.EncryptionConfig.EncryptionProviderFile == "" {
