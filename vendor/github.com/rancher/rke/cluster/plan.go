@@ -219,7 +219,7 @@ func (c *Cluster) BuildKubeAPIProcess(host *hosts.Host, prefixPath string, svcOp
 			fmt.Sprintf("%s=%s", CloudConfigSumEnv, getCloudConfigChecksum(c.CloudConfigFile)))
 	}
 	if c.EncryptionConfig.EncryptionProviderFile != "" {
-		CommandArgs["experimental-encryption-provider-config"] = EncryptionProviderFilePath
+		CommandArgs["encryption-provider-config"] = EncryptionProviderFilePath
 	}
 
 	serviceOptions := c.GetKubernetesServicesOptions(host.DockerInfo.OSType, svcOptionData)
