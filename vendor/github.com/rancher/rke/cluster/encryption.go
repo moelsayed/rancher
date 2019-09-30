@@ -6,8 +6,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"os"
 
 	normantypes "github.com/rancher/norman/types"
 	"github.com/sirupsen/logrus"
@@ -280,17 +278,12 @@ func (c *Cluster) readEncryptionCustomConfig(ctx context.Context, flags External
 	var r map[string]interface{}
 	logrus.Infof("melsayed------------------------------- flags in readEncryptionCustomConfig %#v", flags)
 
-	file, err := os.Open(c.ConfigDir)
+	clusterFile, err := yaml.Marshal(c.RancherKubernetesEngineConfig)
 	if err != nil {
-		return "", fmt.Errorf("can not find cluster configuration file - %v - : %v", c.ConfigDir, err)
+		return "", fmt.Errorf("error marshalling: %v", err)
 	}
-	defer file.Close()
-	buf, err := ioutil.ReadAll(file)
-	if err != nil {
-		return "", fmt.Errorf("failed to read file: %v", err)
-	}
-	clusterFile := string(buf)
-	err = yaml.Unmarshal([]byte(clusterFile), &r)
+	err = yaml.Unmarshal(clusterFile, &r)
+
 	if err != nil {
 		return "", fmt.Errorf("error unmarshalling: %v", err)
 	}
