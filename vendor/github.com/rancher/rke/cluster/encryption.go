@@ -10,6 +10,7 @@ import (
 	"os"
 
 	normantypes "github.com/rancher/norman/types"
+	"github.com/sirupsen/logrus"
 	"sigs.k8s.io/yaml"
 
 	"github.com/rancher/rke/k8s"
