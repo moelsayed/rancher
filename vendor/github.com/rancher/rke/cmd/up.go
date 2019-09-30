@@ -92,7 +92,7 @@ func ClusterUp(ctx context.Context, dialersOptions hosts.DialersOptions, flags c
 	if clusterState.CurrentState.EncryptionConfig != "" {
 		stateEncryptionConfig = clusterState.CurrentState.EncryptionConfig
 	}
-
+	logrus.Infof("melsayed------------------------------- in up %v", stateEncryptionConfig)
 	kubeCluster, err := cluster.InitClusterObject(ctx, clusterState.DesiredState.RancherKubernetesEngineConfig.DeepCopy(), flags, stateEncryptionConfig)
 	if err != nil {
 		return APIURL, caCrt, clientCert, clientKey, nil, err

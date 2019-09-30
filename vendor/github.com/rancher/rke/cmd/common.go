@@ -105,7 +105,7 @@ func ClusterInit(ctx context.Context, rkeConfig *v3.RancherKubernetesEngineConfi
 	if fullState.DesiredState.EncryptionConfig != "" {
 		kubeCluster.EncryptionConfig.EncryptionProviderFile = fullState.DesiredState.EncryptionConfig
 	}
-
+	logrus.Infof("melsayed------------------------------- in ClusterInit %v", rkeFullState.DesiredState.EncryptionConfig)
 	rkeState := cluster.FullState{
 		DesiredState: fullState.DesiredState,
 		CurrentState: fullState.CurrentState,
