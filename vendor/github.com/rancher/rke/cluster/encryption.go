@@ -6,6 +6,8 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"os"
 
 	normantypes "github.com/rancher/norman/types"
 	"github.com/sirupsen/logrus"
@@ -276,27 +278,49 @@ func disabledProviderFileFromKey(keyList interface{}) (string, error) {
 
 func (c *Cluster) readEncryptionCustomConfig(ctx context.Context, flags ExternalFlags) (string, error) {
 	var r map[string]interface{}
+	var clusterFile, jsonConfig, customConfig []byte
+	var err error
 	logrus.Infof("melsayed------------------------------- flags in readEncryptionCustomConfig %#v", flags)
 
-	clusterFile, err := yaml.Marshal(c.RancherKubernetesEngineConfig)
-	if err != nil {
-		return "", fmt.Errorf("error marshalling: %v", err)
+	file, err := os.Open(c.ConfigDir)
+	if err == nil {
+		clusterFile, err = ioutil.ReadAll(file)
+		defer file.Close()
+		if err != nil {
+			return "", fmt.Errorf("failed to read file: %v", err)
+		}
+		err = yaml.Unmarshal(clusterFile, &r)
+		if err != nil {
+			return "", fmt.Errorf("error unmarshalling: %v", err)
+		}
+		services := r["services"].(map[string]interface{})
+		kubeapi := services["kube-api"].(map[string]interface{})
+		sec := kubeapi["secrets_encryption_config"].(map[string]interface{})
+		jsonConfig, err = json.Marshal(sec["custom_config"])
+		if err != nil {
+			return "", fmt.Errorf("error marshalling: %v", err)
+		}
+	} else {
+		log.Warnf(ctx, "can not find cluster configuration file: %v", err)
+		log.Infof(ctx, "Falling back to RancherKubernetesConfig for EncryptionCustomConfig")
+		clusterFile, err = yaml.Marshal(c.RancherKubernetesEngineConfig)
+		if err != nil {
+			return "", fmt.Errorf("error marshalling: %v", err)
+		}
+		err = yaml.Unmarshal(clusterFile, &r)
+		if err != nil {
+			return "", fmt.Errorf("error unmarshalling: %v", err)
+		}
+		services := r["services"].(map[string]interface{})
+		kubeapi := services["kubeApi"].(map[string]interface{})
+		sec := kubeapi["secretsEncryptionConfig"].(map[string]interface{})
+		jsonConfig, err = json.Marshal(sec["customConfig"])
+		if err != nil {
+			return "", fmt.Errorf("error marshalling: %v", err)
+		}
 	}
-	err = yaml.Unmarshal(clusterFile, &r)
 
-	if err != nil {
-		return "", fmt.Errorf("error unmarshalling: %v", err)
-	}
-	logrus.Infof("melsayed------------------------------- flags in readEncryptionCustomConfig %#v", r)
-
-	services := r["services"].(map[string]interface{})
-	kubeapi := services["kube-api"].(map[string]interface{})
-	sec := kubeapi["secrets_encryption_config"].(map[string]interface{})
-	jsonConfig, err := json.Marshal(sec["custom_config"])
-	if err != nil {
-		return "", fmt.Errorf("error marshalling: %v", err)
-	}
-	customConfig, err := yaml.JSONToYAML(jsonConfig)
+	customConfig, err = yaml.JSONToYAML(jsonConfig)
 
 	return string(customConfig), err
 }
