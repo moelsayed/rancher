@@ -16,7 +16,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	apiserverconfig "k8s.io/apiserver/pkg/apis/config/v1"
+	apiserverconfig "k8s.io/apiserver/pkg/apis/config"
 	"k8s.io/client-go/kubernetes"
 	"sigs.k8s.io/yaml"
 )
