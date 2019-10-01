@@ -280,7 +280,7 @@ func (c *Cluster) readEncryptionCustomConfig(ctx context.Context, flags External
 	var r map[string]interface{}
 	var clusterFile, jsonConfig, customConfig []byte
 	var err error
-	logrus.Infof("melsayed------------------------------- flags in readEncryptionCustomConfig %#v", flags)
+	logrus.Infof("melsayed------------------------------------------------ in readEncryptionCustomConfig %v", c.RancherKubernetesEngineConfig.Services.KubeAPI.SecretsEncryptionConfig.CustomConfig.String())
 
 	file, err := os.Open(c.ConfigDir)
 	if err == nil {
