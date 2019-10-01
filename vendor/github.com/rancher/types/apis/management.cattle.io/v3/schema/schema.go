@@ -45,8 +45,7 @@ var (
 		Init(credTypes).
 		Init(mgmtSecretTypes).
 		Init(clusterTemplateTypes).
-		Init(driverMetadataTypes).
-		Init(encryptionProviderTypes)
+		Init(driverMetadataTypes)
 
 	TokenSchemas = factory.Schemas(&Version).
 			Init(tokens)
@@ -898,8 +897,4 @@ func clusterScanTypes(schemas *types.Schemas) *types.Schemas {
 		schema.CollectionMethods = []string{http.MethodGet}
 		schema.ResourceMethods = []string{http.MethodGet, http.MethodDelete}
 	})
-}
-
-func encryptionProviderTypes(schemas *types.Schemas) *types.Schemas {
-	return schemas.MustImport(&Version, v3.SecretsEncryptionConfig{})
 }
