@@ -222,7 +222,7 @@ func (d *Driver) Update(ctx context.Context, clusterInfo *types.ClusterInfo, opt
 	if err != nil {
 		return nil, err
 	}
-	logrus.Infof("melsayed------------------------------------------------ in DRIVER UPDATE %v", rkeConfig.Services.KubeAPI.SecretsEncryptionConfig)
+	logrus.Infof("melsayed------------------------------------------------ in DRIVER UPDATE %v", rkeConfig.Services.KubeAPI.SecretsEncryptionConfig.CustomConfig)
 	dialers, externalFlags := d.getFlags(rkeConfig, stateDir)
 	if err := cmd.ClusterInit(ctx, &rkeConfig, dialers, externalFlags); err != nil {
 		return nil, err
