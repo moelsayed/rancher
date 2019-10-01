@@ -226,6 +226,8 @@ github.com/moelsayed/types v0.0.0-20190930184415-47a189050b4d h1:SrJsfvPFbX4YQJe
 github.com/moelsayed/types v0.0.0-20190930184415-47a189050b4d/go.mod h1:8Aei/0vCfM6g2tUO/9BUNVsElVs3ENewMDk61NdQb3U=
 github.com/moelsayed/types v0.0.0-20191001034413-f70f128a5f7e h1:NSywtNAgbBT4cftEX2Kk2ctOw5fuj/PHDhTj0o2Qzzo=
 github.com/moelsayed/types v0.0.0-20191001034413-f70f128a5f7e/go.mod h1:8Aei/0vCfM6g2tUO/9BUNVsElVs3ENewMDk61NdQb3U=
+github.com/moelsayed/types v0.0.0-20191001060743-c2884e1c2c63 h1:U3ZMAbYM9YnQvR7l3p0DlgNwtjXo1DmU5C5Zf+fvpdc=
+github.com/moelsayed/types v0.0.0-20191001060743-c2884e1c2c63/go.mod h1:8Aei/0vCfM6g2tUO/9BUNVsElVs3ENewMDk61NdQb3U=
 github.com/morikuni/aec v0.0.0-20170113033406-39771216ff4c h1:nXxl5PrvVm2L/wCy8dQu6DMTwH4oIuGN8GJDAlqDdVE=
 github.com/morikuni/aec v0.0.0-20170113033406-39771216ff4c/go.mod h1:BbKIizmSmc5MMPqRYbxO4ZU0S0+P200+tUnFx7PXmsc=
 github.com/mrjones/oauth v0.0.0-20180629183705-f4e24b6d100c h1:3wkDRdxK92dF+c1ke2dtj7ZzemFWBHB9plnJOtlwdFA=

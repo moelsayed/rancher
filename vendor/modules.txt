@@ -354,7 +354,7 @@ github.com/rancher/rke/dind
 github.com/rancher/rke/cloudprovider/custom
 github.com/rancher/rke/cloudprovider/openstack
 github.com/rancher/rke/cloudprovider/vsphere
-# github.com/rancher/types v0.0.0-20190923165440-59fbe5e3a97f => github.com/moelsayed/types v0.0.0-20191001034413-f70f128a5f7e
+# github.com/rancher/types v0.0.0-20190923165440-59fbe5e3a97f => github.com/moelsayed/types v0.0.0-20191001060743-c2884e1c2c63
 github.com/rancher/types/apis/management.cattle.io/v3
 github.com/rancher/types/client/management/v3
 github.com/rancher/types/config
@@ -676,6 +676,7 @@ k8s.io/apimachinery/pkg/api/equality
 # k8s.io/apiserver v0.0.0-20190918223255-26459790ef01
 k8s.io/apiserver/pkg/authentication/user
 k8s.io/apiserver/pkg/server/healthz
+k8s.io/apiserver/pkg/apis/config/v1
 k8s.io/apiserver/pkg/apis/config
 k8s.io/apiserver/pkg/admission
 k8s.io/apiserver/pkg/util/feature
