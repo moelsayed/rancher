@@ -79,8 +79,6 @@ func UpCommand() cli.Command {
 
 func ClusterUp(ctx context.Context, dialersOptions hosts.DialersOptions, flags cluster.ExternalFlags, data map[string]interface{}) (string, string, string, string, map[string]pki.CertificatePKI, error) {
 	var APIURL, caCrt, clientCert, clientKey string
-	logrus.Infof("melsayed------------------------------- flags in up %#v", flags)
-
 	clusterState, err := cluster.ReadStateFile(ctx, cluster.GetStateFilePath(flags.ClusterFilePath, flags.ConfigDir))
 	if err != nil {
 		return APIURL, caCrt, clientCert, clientKey, nil, err
@@ -93,7 +91,6 @@ func ClusterUp(ctx context.Context, dialersOptions hosts.DialersOptions, flags c
 	if clusterState.CurrentState.EncryptionConfig != "" {
 		stateEncryptionConfig = clusterState.CurrentState.EncryptionConfig
 	}
-	logrus.Infof("melsayed------------------------------- in up %v", stateEncryptionConfig)
 	kubeCluster, err := cluster.InitClusterObject(ctx, clusterState.DesiredState.RancherKubernetesEngineConfig.DeepCopy(), flags, stateEncryptionConfig)
 	if err != nil {
 		return APIURL, caCrt, clientCert, clientKey, nil, err

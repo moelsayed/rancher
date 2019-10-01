@@ -70,8 +70,6 @@ func setOptionsFromCLI(c *cli.Context, rkeConfig *v3.RancherKubernetesEngineConf
 func ClusterInit(ctx context.Context, rkeConfig *v3.RancherKubernetesEngineConfig, dialersOptions hosts.DialersOptions, flags cluster.ExternalFlags) error {
 	log.Infof(ctx, "Initiating Kubernetes cluster")
 	var fullState *cluster.FullState
-	logrus.Infof("melsayed------------------------------------------------ in ClusterInit %v", rkeConfig.Services.KubeAPI.SecretsEncryptionConfig.CustomConfig.String())
-
 	stateFilePath := cluster.GetStateFilePath(flags.ClusterFilePath, flags.ConfigDir)
 	if len(flags.CertificateDir) == 0 {
 		flags.CertificateDir = cluster.GetCertificateDirPath(flags.ClusterFilePath, flags.ConfigDir)
@@ -107,7 +105,6 @@ func ClusterInit(ctx context.Context, rkeConfig *v3.RancherKubernetesEngineConfi
 	if fullState.DesiredState.EncryptionConfig != "" {
 		kubeCluster.EncryptionConfig.EncryptionProviderFile = fullState.DesiredState.EncryptionConfig
 	}
-	logrus.Infof("melsayed------------------------------- in ClusterInit %v", rkeFullState.DesiredState.EncryptionConfig)
 	rkeState := cluster.FullState{
 		DesiredState: fullState.DesiredState,
 		CurrentState: fullState.CurrentState,
