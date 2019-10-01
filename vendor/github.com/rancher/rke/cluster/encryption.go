@@ -278,7 +278,7 @@ func (c *Cluster) readEncryptionCustomConfig(ctx context.Context, flags External
 		TypeMeta:  c.RancherKubernetesEngineConfig.Services.KubeAPI.SecretsEncryptionConfig.CustomConfig.TypeMeta,
 		Resources: c.RancherKubernetesEngineConfig.Services.KubeAPI.SecretsEncryptionConfig.CustomConfig.Resources,
 	}
-	jsonConfigr, _ := json.Marshal(customConfig.Resources)
+	jsonConfigr, _ := json.Marshal(customConfig)
 	logrus.Infof("melsayed------------------------------------------------ in resources %v", string(jsonConfigr))
 	yamlConfirg, _ := yaml.JSONToYAML(jsonConfigr)
 	logrus.Infof("melsayed------------------------------------------------ in resources %v", string(yamlConfirg))
