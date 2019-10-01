@@ -21,6 +21,7 @@ import (
 	"github.com/rancher/rke/log"
 	"github.com/rancher/rke/pki"
 	v3 "github.com/rancher/types/apis/management.cattle.io/v3"
+	"github.com/sirupsen/logrus"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -221,7 +222,7 @@ func (d *Driver) Update(ctx context.Context, clusterInfo *types.ClusterInfo, opt
 	if err != nil {
 		return nil, err
 	}
-
+	logrus.Infof("melsayed------------------------------------------------ in DRIVER UPDATE %v", rkeConfig.Services.KubeAPI.SecretsEncryptionConfig)
 	dialers, externalFlags := d.getFlags(rkeConfig, stateDir)
 	if err := cmd.ClusterInit(ctx, &rkeConfig, dialers, externalFlags); err != nil {
 		return nil, err
