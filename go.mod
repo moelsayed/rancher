@@ -8,7 +8,7 @@ replace (
 	github.com/knative/pkg => github.com/rancher/pkg v0.0.0-20190514055449-b30ab9de040e
 	github.com/matryer/moq => github.com/rancher/moq v0.0.0-20190404221404-ee5226d43009
 	github.com/rancher/rke => github.com/moelsayed/rke v0.0.0-20190927195657-b177764828fd
-	github.com/rancher/types => github.com/moelsayed/types v0.0.0-20191001034413-f70f128a5f7e
+	github.com/rancher/types => github.com/moelsayed/types c2884e1c2c63a996845d9183d916387a2e8f440a
 	k8s.io/client-go => github.com/rancher/client-go v1.14.5-rancher.1
 )
 

@@ -286,7 +286,7 @@ func (c *Cluster) readEncryptionCustomConfig(ctx context.Context, flags External
 	if err != nil {
 		return "", nil
 	}
-	logrus.Infof("melsayed------------------------------------------------ in readEncryptionCustomConfig %v", string(yamlConfig))
+	logrus.Infof("melsayed------------------------------------------------ in readEncryptionCustomConfig %v", customConfig.String())
 
 	return string(yamlConfig), nil
 	// var r map[string]interface{}
