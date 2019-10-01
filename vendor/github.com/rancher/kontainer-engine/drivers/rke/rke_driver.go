@@ -206,6 +206,7 @@ func (d *Driver) Update(ctx context.Context, clusterInfo *types.ClusterInfo, opt
 	if err != nil {
 		return nil, err
 	}
+	logrus.Infof("melsayed----------------------yaml-------------------------- in DRIVER UPDATE %v", yaml)
 
 	rkeConfig, err := util.ConvertToRkeConfig(yaml)
 	if err != nil {
