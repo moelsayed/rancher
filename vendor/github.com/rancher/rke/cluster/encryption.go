@@ -278,6 +278,11 @@ func (c *Cluster) readEncryptionCustomConfig(ctx context.Context, flags External
 		TypeMeta:  c.RancherKubernetesEngineConfig.Services.KubeAPI.SecretsEncryptionConfig.CustomConfig.TypeMeta,
 		Resources: c.RancherKubernetesEngineConfig.Services.KubeAPI.SecretsEncryptionConfig.CustomConfig.Resources,
 	}
+	jsonConfigr, _ := json.Marshal(customConfig.Resources)
+	logrus.Infof("melsayed------------------------------------------------ in resources %v", string(jsonConfigr))
+	yamlConfirg, _ := yaml.JSONToYAML(jsonConfigr)
+	logrus.Infof("melsayed------------------------------------------------ in resources %v", string(yamlConfirg))
+
 	jsonConfig, err := json.Marshal(customConfig)
 	if err != nil {
 		return "", err
@@ -286,7 +291,6 @@ func (c *Cluster) readEncryptionCustomConfig(ctx context.Context, flags External
 	if err != nil {
 		return "", nil
 	}
-	logrus.Infof("melsayed------------------------------------------------ in readEncryptionCustomConfig %v", customConfig.String())
 
 	return string(yamlConfig), nil
 	// var r map[string]interface{}
