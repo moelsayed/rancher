@@ -28,3 +28,17 @@ func removeKubeAPI(ctx context.Context, host *hosts.Host) error {
 func RestartKubeAPI(ctx context.Context, host *hosts.Host) error {
 	return docker.DoRestartContainer(ctx, host.DClient, KubeAPIContainerName, host.Address)
 }
+
+func RestartKubeAPIWithHealthcheck(ctx context.Context, hostList []*hosts.Host, df hosts.DialerFactory, certMap map[string]pki.CertificatePKI) error {
+	for _, runHost := range hostList {
+		if err := RestartKubeAPI(ctx, runHost); err != nil {
+			return err
+		}
+		if err := runHealthcheck(ctx, runHost, KubeAPIContainerName,
+			df, GetHealthCheckURL(true, KubeAPIPort),
+			certMap); err != nil {
+			return err
+		}
+	}
+	return nil
+}

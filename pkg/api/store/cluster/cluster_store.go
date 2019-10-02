@@ -172,7 +172,12 @@ func (r *Store) Create(apiContext *types.APIContext, schema *types.Schema, data 
 	if err := canUseClusterName(apiContext, name); err != nil {
 		return nil, err
 	}
+	if config := values.GetValueN(data, "rancherKubernetesEngineConfig", "services", "kubeApi", "secretsEncryptionConfig", "customConfig", "resources", "providers", "aescbc", "keys"); config != nil {
+		logrus.Infof("melsayed...............in store %#v", config)
+	} else {
+		logrus.Infof("melsayed...............in store not here")
 
+	}
 	//check if template is passed. if yes, load template data
 	if hasTemplate(data) {
 		clusterTemplateRevision, clusterTemplate, err := r.validateTemplateInput(apiContext, data, false)
@@ -216,6 +221,12 @@ func (r *Store) Create(apiContext *types.APIContext, schema *types.Schema, data 
 	}
 	if err := validateS3Credentials(data); err != nil {
 		return nil, err
+	}
+	if config := values.GetValueN(data, "rancherKubernetesEngineConfig", "services", "kubeApi", "secretsEncryptionConfig"); config != nil {
+		logrus.Infof("melsayed...............in store %#v", config)
+	} else {
+		logrus.Infof("melsayed...............in store not here")
+
 	}
 	return r.Store.Create(apiContext, schema, data)
 }
@@ -419,6 +430,12 @@ func (r *Store) Update(apiContext *types.APIContext, schema *types.Schema, data 
 		return nil, err
 	}
 
+	if config := values.GetValueN(data, "rancherKubernetesEngineConfig", "services", "kubeApi", "secretsEncryptionConfig", "customConfig", "resources", "providers", "aescbc", "keys"); config != nil {
+		logrus.Infof("melsayed...............in store update %#v", config)
+	} else {
+		logrus.Infof("melsayed...............in store update not here")
+
+	}
 	clusterName, ok := existingCluster["name"].(string)
 	if !ok {
 		clusterName = ""

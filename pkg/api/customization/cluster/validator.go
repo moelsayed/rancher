@@ -27,7 +27,7 @@ type Validator struct {
 
 func (v *Validator) Validator(request *types.APIContext, schema *types.Schema, data map[string]interface{}) error {
 	var spec v3.ClusterSpec
-
+	// _ = isEncryptionConfigCustom(data)
 	if err := convert.ToObj(data, &spec); err != nil {
 		return httperror.WrapAPIError(err, httperror.InvalidBodyContent, "Cluster spec conversion error")
 	}
@@ -147,3 +147,24 @@ func (v *Validator) isTemplateAccessible(request *types.APIContext, spec *mgmtcl
 
 	return true, nil
 }
+
+// func isEncryptionConfigCustom(data map[string]interface{}) bool {
+// 	rkeConfig, ok := values.GetValue(data, "rancherKubernetesEngineConfig")
+// 	if !ok || rkeConfig == nil {
+// 		return false
+// 	}
+//
+// 	// logrus.Infof("melsayed-----------------------isEncryptionConfigCustom %#v ", data)
+//
+// 	for _, step := range []string{"rancherKubernetesEngineConfig", "services", "kubeApi", "secretsEncryptionConfig"} {
+// 		logrus.Infof("melsayed-----------------------isEncryptionConfigCustom step %v", step)
+//
+// 		if config, ok := data[step]; ok {
+// 			data = config.(map[string]interface{})
+// 			logrus.Infof("melsayed-----------------------isEncryptionConfigCustom %s %#v ", step, config)
+// 		} else {
+// 			return false
+// 		}
+// 	}
+// 	return false
+// }

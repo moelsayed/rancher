@@ -389,7 +389,6 @@ func (p *Provisioner) reconcileCluster(cluster *v3.Cluster, create bool) (*v3.Cl
 	if skipProvisioning(cluster) {
 		return cluster, nil
 	}
-
 	var (
 		apiEndpoint, serviceAccountToken, caCert string
 		err                                      error
@@ -414,7 +413,6 @@ func (p *Provisioner) reconcileCluster(cluster *v3.Cluster, create bool) (*v3.Cl
 
 		cluster.Status.ServiceAccountToken = serviceAccountToken
 		v3.ClusterConditionServiceAccountMigrated.True(cluster)
-
 		// Update the cluster in k8s
 		cluster, err = p.Clusters.Update(cluster)
 		if err != nil {
@@ -457,7 +455,6 @@ func (p *Provisioner) reconcileCluster(cluster *v3.Cluster, create bool) (*v3.Cl
 		apiEndpoint, serviceAccountToken, caCert, updateTriggered, err = p.driverUpdate(cluster, *spec)
 	} else {
 		logrus.Infof("Updating cluster [%s]", cluster.Name)
-
 		// Attempt to manually trigger updating, otherwise it will not be triggered until after exiting reconcile
 		v3.ClusterConditionUpdated.Unknown(cluster)
 		cluster, err = p.Clusters.Update(cluster)
