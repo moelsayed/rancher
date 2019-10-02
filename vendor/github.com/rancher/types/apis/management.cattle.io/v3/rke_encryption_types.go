@@ -20,8 +20,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-
 // EncryptionConfiguration stores the complete configuration for encryption providers.
 type EncryptionConfiguration struct {
 	//metav1.TypeMeta
