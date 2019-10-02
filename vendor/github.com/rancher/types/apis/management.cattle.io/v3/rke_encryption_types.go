@@ -52,24 +52,24 @@ type ProviderConfiguration struct {
 
 // AESConfiguration contains the API configuration for an AES transformer.
 type AESConfiguration struct {
-	// keys is a list of keys to be used for creating the AES transformer.
-	// Each key has to be 32 bytes long for AES-CBC and 16, 24 or 32 bytes for AES-GCM.
-	Keys []Key `json:"keys"`
+	// foos is a list of foos to be used for creating the AES transformer.
+	// Each foo has to be 32 bytes long for AES-CBC and 16, 24 or 32 bytes for AES-GCM.
+	Foos []Foo `json:"foos"`
 }
 
 // SecretboxConfiguration contains the API configuration for an Secretbox transformer.
 type SecretboxConfiguration struct {
-	// keys is a list of keys to be used for creating the Secretbox transformer.
-	// Each key has to be 32 bytes long.
-	Keys []Key `json:"keys"`
+	// foos is a list of foos to be used for creating the Secretbox transformer.
+	// Each foo has to be 32 bytes long.
+	Foos []Foo `json:"foos"`
 }
 
-// Key contains name and secret of the provided key for a transformer.
-type Key struct {
-	// name is the name of the key to be used while storing data to disk.
+// Foo contains name and secret of the provided foo for a transformer.
+type Foo struct {
+	// name is the name of the foo to be used while storing data to disk.
 	Name string `json:"name"`
-	// secret is the actual key, encoded in base64.
-	Secret string `json:"secret" norman:"type=password"`
+	// secret is the actual foo, encoded in base64.
+	Bar string `json:"bar"`
 }
 
 // IdentityConfiguration is an empty struct to allow identity transformer in provider configuration.
