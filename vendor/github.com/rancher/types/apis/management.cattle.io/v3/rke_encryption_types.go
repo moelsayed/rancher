@@ -34,7 +34,6 @@ type ResourceConfiguration struct {
 	// providers is a list of transformers to be used for reading and writing the resources to disk.
 	// eg: aesgcm, aescbc, secretbox, identity.
 	Providers []ProviderConfiguration `json:"providers"`
-	Keys      []Key                   `json:"keys"`
 }
 
 // ProviderConfiguration stores the provided configuration for an encryption provider.
