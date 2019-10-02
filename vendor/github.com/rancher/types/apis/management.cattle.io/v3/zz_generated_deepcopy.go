@@ -8258,6 +8258,11 @@ func (in *ResourceConfiguration) DeepCopyInto(out *ResourceConfiguration) {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
 	}
+	if in.Keys != nil {
+		in, out := &in.Keys, &out.Keys
+		*out = make([]Key, len(*in))
+		copy(*out, *in)
+	}
 	return
 }
 
