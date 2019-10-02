@@ -2,9 +2,9 @@ package client
 
 const (
 	SecretboxConfigurationType      = "secretboxConfiguration"
-	SecretboxConfigurationFieldFoos = "foos"
+	SecretboxConfigurationFieldKeys = "keys"
 )
 
 type SecretboxConfiguration struct {
-	Foos []Foo `json:"foos,omitempty" yaml:"foos,omitempty"`
+	Keys []Key `json:"keys,omitempty" yaml:"keys,omitempty"`
 }

@@ -2,9 +2,9 @@ package client
 
 const (
 	AESConfigurationType      = "aesConfiguration"
-	AESConfigurationFieldFoos = "foos"
+	AESConfigurationFieldKeys = "keys"
 )
 
 type AESConfiguration struct {
-	Foos []Foo `json:"foos,omitempty" yaml:"foos,omitempty"`
+	Keys []Key `json:"keys,omitempty" yaml:"keys,omitempty"`
 }
