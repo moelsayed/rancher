@@ -288,5 +288,6 @@ func (c *Cluster) readEncryptionCustomConfig(ctx context.Context) (string, error
 		return "", nil
 	}
 
-	return string(yamlConfig), nil
+	return templates.CompileTemplateFromMap(templates.CustomEncryptionProviderFile,
+		struct{CustomConfig string}{CustomConfig: string(yamlConfig)})
 }
