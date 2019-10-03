@@ -228,8 +228,9 @@ func InitClusterObject(ctx context.Context, rkeConfig *v3.RancherKubernetesEngin
 	if len(c.CertificateDir) == 0 {
 		c.CertificateDir = GetCertificateDirPath(c.ConfigPath, c.ConfigDir)
 	}
-	if isEncryptionCustomConfig(rkeConfig) && c.EncryptionConfig.EncryptionProviderFile == "" {
-		if c.EncryptionConfig.EncryptionProviderFile, err = c.readEncryptionCustomConfig(ctx); err != nil {
+	// We don't manage custom configuration, if it's there we just use it.
+	if isEncryptionCustomConfig(rkeConfig) {
+		if c.EncryptionConfig.EncryptionProviderFile, err = c.readEncryptionCustomConfig(); err != nil {
 			return nil, err
 		}
 	} else if isEncryptionEnabled(rkeConfig) && c.EncryptionConfig.EncryptionProviderFile == "" {
@@ -237,6 +238,7 @@ func InitClusterObject(ctx context.Context, rkeConfig *v3.RancherKubernetesEngin
 			return nil, err
 		}
 	}
+
 	// Setting cluster Defaults
 	err = c.setClusterDefaults(ctx, flags)
 	if err != nil {

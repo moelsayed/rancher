@@ -273,7 +273,7 @@ func disabledProviderFileFromKey(keyList interface{}) (string, error) {
 	return templates.CompileTemplateFromMap(templates.DisabledEncryptionProviderFile, keyList)
 }
 
-func (c *Cluster) readEncryptionCustomConfig(ctx context.Context) (string, error) {
+func (c *Cluster) readEncryptionCustomConfig() (string, error) {
 	// directly marshalling apiserverconfig.EncryptionConfiguration to yaml breaks things because TypeMeta
 	// is nested and all fields don't have yaml tags. So we do this as a work around.
 	customConfig := v3.CustomEncryptionConfiguration{
